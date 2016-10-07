@@ -1,0 +1,27 @@
+﻿@using System.Web.UI.HtmlControls
+@model List<string>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Новости лалки</title>
+</head>
+<body>
+
+<h3>Запрос поиска постов друзей выполнялся: @ViewBag.ExecTime секунд</h3>
+<br/>
+
+@foreach (var text in Model)
+{
+    <div style="background-color:cornflowerblue; margin: 15px; padding: 8px;">
+        @text
+    </div>
+}
+
+</body>
+</html>

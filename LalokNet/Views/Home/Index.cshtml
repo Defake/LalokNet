@@ -1,0 +1,29 @@
+﻿@using LalokNet.Models
+@model Dictionary<int, LalokNet.Models.VKUser>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Список лалок</title>
+</head>
+<body>
+
+    <h3>Запрос поиска мемберов и их друзей выполнялся: @ViewBag.ExecTime секунд</h3>
+    <div><br/>
+
+
+
+        @foreach (var user in Model.Values) {
+            @Html.ActionLink(user.first_name + " " + user.last_name, "GetUserNews", new { userId = user.id })
+            <br/>
+        }
+
+    </div>
+</body>
+</html>
