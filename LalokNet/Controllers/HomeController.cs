@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using LalokNet.Models;
@@ -13,75 +14,142 @@ namespace LalokNet.Controllers
 
 	public class HomeController : Controller
 	{
-		
-        // GET: Home
-        public ActionResult Index()
+
+		/*
+		 * версия метода с доверянием асинка фреймворку
+		 // GET: Home
+		public async Task<ActionResult> Index()
         {
-			VKInteraction vk = new VKInteraction(5648132);
+			VkInteraction vk = new VkInteraction();
 
 	        Stopwatch watch = new Stopwatch();
 			watch.Start();
 	        long time = watch.ElapsedMilliseconds;
 
-	        var groupMembersObj = new
-	        {
-		        response = new
-		        {
-					count = 0,
-			        items = new VKUser[] {}
-		        }
-	        };
+	        VkUser[] members = Task.Run(() => vk.GetMembers("csu_iit", fields: "true")).Result;
 
-	        var jsonMembers = vk.GetMembers("csu_iit", count: 30, fields: "true");
-			var members = JsonConvert.DeserializeAnonymousType(jsonMembers, groupMembersObj);
-	        VKDataHolder.instance.users = members.response.items.ToDictionary(user => user.id, user => user);
+			//var friendsTask = members.ToDictionary(u => u.id, u => vk.GetFriends(u.id));
 
-	        var friendsObj = new {
-				response = new {
-					count = 0,
-					items = new int[] {}
+			foreach (VkUser u in members)
+			{
+				if (u.deactivated != "")
+				{
+					u.friends = new VkUser[0];
+					continue;
 				}
-			};
+					
+				//u.friends = Task.Run(() => vk.GetFriends(u.id)).Result;
+				u.friends = await vk.GetFriends(u.id);
+			}
 
-			foreach (VKUser u in VKDataHolder.instance.users.Values)
-	        {
-		        string jsonFriends = vk.GetFriends(u.id);
-		        var friends = JsonConvert.DeserializeAnonymousType(jsonFriends, friendsObj);
-		        if (friends.response != null) 
-					u.friends = friends.response.items;
-	        }
+			VkDataHolder.instance.users = members.ToDictionary(user => user.id, user => user);
 
-	        time = (watch.ElapsedMilliseconds - time) / 1000;
+			time = (watch.ElapsedMilliseconds - time) / 1000;
 			watch.Stop();
 	        ViewBag.ExecTime = time;
 
-			return View(VKDataHolder.instance.users);
+			return View(VkDataHolder.instance.users);
+        }
+			 */
+
+		// GET: Home
+		public async Task<ActionResult> Index()
+        {
+			VkInteraction vk = new VkInteraction();
+
+	        Stopwatch watch = new Stopwatch();
+			watch.Start();
+	        long time = watch.ElapsedMilliseconds;
+
+	        VkUser[] members = Task.Run(() => vk.GetMembers("csu_iit", fields: "photo_100, photo_50")).Result;
+
+			var friendsTask = members
+				.Where(u => u.deactivated == "")
+				.ToDictionary(u => u.id, u => vk.GetFriends(u.id, 0, "first_name", "last_name", "photo_100", "photo_50"));
+
+			foreach (VkUser u in members)
+				if (u.deactivated != "")
+					u.friends = new VkUser[0];
+				else
+					u.friends = await friendsTask[u.id];
+
+			VkDataHolder.instance.users = members.ToDictionary(user => user.id, user => user);
+
+			time = (watch.ElapsedMilliseconds - time) / 1000;
+			watch.Stop();
+	        ViewBag.ExecTime = time;
+
+			return View(VkDataHolder.instance.users);
         }
 
-		public ActionResult GetUserNews(int userId)
+		public async Task<ActionResult> GetUserNews(int userId)
 		{
 			if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
-			VKInteraction vk = new VKInteraction(5648132);
-			List<string> posts = new List<string>();
+			VkInteraction vk = new VkInteraction();
+			List<VkPost> posts = new List<VkPost>();
 
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
 			long time = watch.ElapsedMilliseconds;
 
-			var postObj = new {
-				response = new {
-					count = 0,
-					items = new [] { new { text = "" } }
-				}
-			};
+			var postsTask = VkDataHolder.instance.users[userId].friends
+				.Where(u => u.deactivated == "" && u.hidden == "")
+				.ToDictionary(u => u.id, u => vk.GetPosts(u.id, filter: "owner"));
 
-			foreach (int friendId in VKDataHolder.instance.users[userId].friends)
+			foreach (VkUser friend in VkDataHolder.instance.users[userId].friends)
 			{
-				var jsonPosts = vk.GetPosts(friendId, count: 5);
-				var friendPosts = JsonConvert.DeserializeAnonymousType(jsonPosts, postObj);
+				// If this inactive user, pass this iteration
+				if (!postsTask.ContainsKey(friend.id))
+					continue;
 
-				if (friendPosts.response != null)
-					posts.AddRange(friendPosts.response.items.Select(item => item.text));
+				VkPost[] friendPosts = await postsTask[friend.id];
+
+				if (friendPosts == null || friendPosts.Length == 0)
+					continue;
+
+				string name = friend.first_name + " " + friend.last_name;
+				foreach (VkPost post in friendPosts)
+					post.name = name;
+				
+				posts.AddRange(friendPosts);
+			}
+
+			time = (watch.ElapsedMilliseconds - time) / 1000;
+			watch.Stop();
+			ViewBag.ExecTime = time;
+
+			posts.Sort(Comparer<VkPost>.Create((post1, post2) => post2.likes.count - post1.likes.count));
+
+			return View(posts);
+		}
+
+		/*public async Task<ActionResult> GetUserNews(int userId)
+		{
+			if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
+			VkInteraction vk = new VkInteraction();
+			List<VkPost> posts = new List<VkPost>();
+
+			Stopwatch watch = new Stopwatch();
+			watch.Start();
+			long time = watch.ElapsedMilliseconds;
+			
+			foreach (VkUser friend in VkDataHolder.instance.users[userId].friends)
+			{
+				// If this inactive user, pass this iteration
+				if (friend.hidden != "" || friend.deactivated != "")
+					continue;
+				
+				VkPost[] friendPosts = vk.GetPosts(friend.id, count: 5, filter: "owner").Result;
+
+				if (friendPosts == null || friendPosts.Length == 0)
+					continue;
+
+				//string name = vk.GetUsers(new [] {friendPosts[0].from_id.ToString()}, fields: "true")[0].first_name;
+				string name = friend.first_name + " " + friend.last_name;
+				foreach (VkPost post in friendPosts)
+					post.name = name;
+				
+				posts.AddRange(friendPosts);
 			}
 
 			time = (watch.ElapsedMilliseconds - time) / 1000;
@@ -89,6 +157,7 @@ namespace LalokNet.Controllers
 			ViewBag.ExecTime = time;
 
 			return View(posts);
-		}
-    }
+		}*/
+
+	}
 }

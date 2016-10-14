@@ -132,10 +132,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\VKUser.cs" />
+    <Compile Include="JsonToVkConverter.cs" />
+    <Compile Include="Models\VkPost.cs" />
+    <Compile Include="Models\VkUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VKDataHolder.cs" />
-    <Compile Include="VKInteraction.cs" />
+    <Compile Include="VkDataHolder.cs" />
+    <Compile Include="VkInteraction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />

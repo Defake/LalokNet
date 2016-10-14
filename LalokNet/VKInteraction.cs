@@ -6,23 +6,21 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using LalokNet.Models;
+using static LalokNet.JsonToVkConverter;
 
 
 namespace LalokNet {
 
-	// ReSharper disable once InconsistentNaming
-	public class VKInteraction {
+	public class VkInteraction {
 
 		private int appID;
 		private string _protectedKey;
 		private readonly string _version;
 
-		public VKInteraction(int appID) {
+		public VkInteraction() {
 			appID = 5648132;
 			_version = "5.56";
-		}
-
-		public VKInteraction(int appID, string key) : this(appID) {
 			_protectedKey = "ADvbqKGGpfAfGvBUjcMO";
 		}
 
@@ -30,73 +28,128 @@ namespace LalokNet {
 		/// Get all group members
 		/// </summary>
 		/// <param name="groupID">number or text identifier of the group as string</param>
-		/// <param name="count">count of members to get. Default: 200</param>
-		/// <param name="fields">Additional fields for users. Default: </param>
-		/// <param name="sort">Possible options: id_asc, id_desc, time_asc (default), time_desc </param>
-		/// <returns>json array with all group members</returns>
-		public string GetMembers(string groupID, int count = 200, params string[] fields)
+		/// <param name="count">count of members to get. Maximum (and default): 1000</param>
+		/// <param name="fields">Additional fields for users. Default: none</param>
+		/// <returns>List of VKUser</returns>
+		public async Task<VkUser[]> GetMembers(string groupID, int count = 1000, params string[] fields)
 		{
-			string strFields = "";
-			if (fields != null)
-				//strFields = fields.Aggregate(strFields, (current, field) => current + (current + ","));
-				foreach (string field in fields)
-					strFields += field + ",";
+			string strFields = MakeSingleParameter(fields);
 
-			return PerformRequest("groups.getMembers", new VKStringParameter("group_id", groupID),
-														new VKIntegerParameter("count", count),
-														new VKStringParameter("fields", strFields));
+			string jsonResponse = await Task.Run(() => PerformRequest(
+														"groups.getMembers", 
+														new VkStringParameter("group_id", groupID),
+														new VkIntegerParameter("count", count),
+														new VkStringParameter("fields", strFields)));
+
+			return Deserialize(jsonResponse, new VkUser[] { }, "response", "items");
 		}
 
 		/// <summary>
 		/// Get friends array of some user
 		/// </summary>
 		/// <param name="userID"></param>
-		/// <param name="count"></param>
-		/// <param name="fields"></param>
+		/// <param name="count">Count of friends to get. Default: all friends</param>
+		/// <param name="fields">additional fields to get</param>
 		/// <returns></returns>
-		public string GetFriends(int userID, int count = 200, params string[] fields) {
-			string strFields = "";
-			if (fields != null)
-				foreach (string field in fields)
-					strFields += field + ",";
+		public async Task<VkUser[]> GetFriends(int userID, int count = 0, params string[] fields) 
+		{
+			string strFields = MakeSingleParameter(fields);
 
-			return PerformRequest("friends.get", new VKIntegerParameter("user_id", userID),
-													new VKIntegerParameter("count", count),
-													new VKStringParameter("fields", strFields));
+			var jsonResponse = await Task.Run(() => PerformRequest(
+													"friends.get", 
+													new VkIntegerParameter("user_id", userID),
+													new VkIntegerParameter("count", count),
+													new VkStringParameter("fields", strFields)));
+
+			return Deserialize(jsonResponse, new VkUser[] {}, "response", "items");
 		}
 
-		public string GetPosts(int ownerID, int count = 200) {
-			return PerformRequest("wall.get", new VKIntegerParameter("owner_id", ownerID),
-													new VKIntegerParameter("count", count));
+		/// <summary>
+		/// Take posts from a user's wall
+		/// </summary>
+		/// <param name="ownerID">User of the wall</param>
+		/// <param name="count">Count of posts to get. Maximum (and default) value = 100</param>
+		/// <param name="filter">all / owner / others. Default: all</param>
+		/// <returns></returns>
+		public async Task<VkPost[]> GetPosts(int ownerID, int count = 0, string filter = "all")
+		{
+			var jsonResponse = await Task.Run(() => PerformRequest(
+														"wall.get", 
+														new VkIntegerParameter("owner_id", ownerID),
+														//new VkIntegerParameter("extended", 1),
+														new VkIntegerParameter("count", count),
+														new VkStringParameter("filter", filter)
+														));
+
+			return Deserialize(jsonResponse, new VkPost[] {}, "response", "items");
+		}
+
+		public async Task<int> GetPostsNumber(int ownerID, string filter="all")
+		{
+			var jsonResponse = await Task.Run(() => PerformRequest(
+														"wall.get", 
+														new VkIntegerParameter("owner_id", ownerID),
+														new VkIntegerParameter("count", 1),
+														new VkStringParameter("filter", filter)
+														));
+
+			return Deserialize(jsonResponse, new int {}, "response", "count");
 		}
 
 		/// <summary>
 		/// Get User data
 		/// </summary>
-		/// <param name="userID">string or integer user id</param>
-		/// <returns>JSON object with </returns>
-		public string GetUser(string userID) {
-			return PerformRequest("users.get", new VKStringParameter("user_ids", userID),
-											new VKStringParameter("fields", "photo_50,city,verified"),
-											new VKStringParameter("name_case", "Nom"));
+		/// <param name="userID">Not null string array of user ids</param>
+		/// <param name="fields">Additional fields to get</param>
+		/// <returns>JSON object with users data</returns>
+		public async Task<VkUser[]> GetUsers(string[] userID, params string[] fields)
+		{
+			if (userID == null) throw new ArgumentNullException("parameter " + nameof(userID) + "Can't be null array");
+
+			var userIds = MakeSingleParameter(userID);
+			var fieldsStr = MakeSingleParameter(fields);
+
+			var jsonResponse =  await Task.Run(() => PerformRequest("users.get", 
+														new VkStringParameter("user_ids", userIds),
+														new VkStringParameter("fields", fieldsStr),
+														new VkStringParameter("name_case", "Nom")));
+
+			return Deserialize(jsonResponse, new VkUser[] {}, "response");
+		}
+
+		public static T AnonCast<T>(T typeHolder, object x) {
+			return (T) x;
+		}
+
+		private static string MakeSingleParameter(string[] parameters)
+		{
+			if (parameters == null)
+				return "";
+
+			string str = "";
+			
+			foreach (string field in parameters)
+				str += field + ",";
+
+			return str.TrimEnd(',');
 		}
 
 		/// <summary>
-		/// Performs vkapi request
+		/// Performs vk api request
 		/// </summary>
 		/// <param name="methodName"></param>
 		/// <param name="args"></param>
-		/// <returns>JSON response</returns>
-		private string PerformRequest(string methodName, params IVKParameter[] args) {
+		/// <returns>JSON object response as a string</returns>
+		private string PerformRequest(string methodName, params VkParameter[] args) {
 			string request = "https://api.vk.com/method/" + methodName + "?";
 
-			foreach (IVKParameter p in args) {
+			foreach (VkParameter p in args) {
 				request += p.paramName + "=" + p.GetValue() + "&";
 			}
 
 			request += "v=" + _version;
 
-			// Do request
+			// Perform the req
 			WebRequest reqGET = WebRequest.Create(request);
 			WebResponse webResp = reqGET.GetResponse();
 			Stream stream = webResp.GetResponseStream();
@@ -105,15 +158,20 @@ namespace LalokNet {
 			return sr.ReadToEnd();
 		}
 
-		private abstract class IVKParameter {
+		//static DateTime ConvertDateFromUnix(double timestamp) {
+		//	DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+		//	return origin.AddSeconds(timestamp);
+		//}
+
+		private abstract class VkParameter {
 			public string paramName { get; protected set; }
 			public abstract string GetValue();
 		}
 
-		private class VKStringParameter : IVKParameter {
+		private class VkStringParameter : VkParameter {
 			private readonly string _value;
 
-			public VKStringParameter(string paramName, string value) {
+			public VkStringParameter(string paramName, string value) {
 				this.paramName = paramName;
 				this._value = value;
 			}
@@ -124,15 +182,15 @@ namespace LalokNet {
 
 		}
 
-		private class VKIntegerParameter : IVKParameter {
+		private class VkIntegerParameter : VkParameter {
 			private readonly int _value;
 
-			public VKIntegerParameter(string paramName, string value) {
+			public VkIntegerParameter(string paramName, string value) {
 				this.paramName = paramName;
 				_value = int.Parse(value);
 			}
 
-			public VKIntegerParameter(string paramName, int value) {
+			public VkIntegerParameter(string paramName, int value) {
 				this.paramName = paramName;
 				_value = value;
 			}
@@ -142,9 +200,7 @@ namespace LalokNet {
 			}
 
 		}
-
-
-
+	
 	}
 
 }

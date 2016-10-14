@@ -1,5 +1,5 @@
 ﻿@using LalokNet.Models
-@model Dictionary<int, LalokNet.Models.VKUser>
+@model Dictionary<int, LalokNet.Models.VkUser>
 
 @{
     Layout = null;
@@ -14,14 +14,68 @@
 </head>
 <body>
 
+<style>
+    .personBlock {
+        width: 360px;
+        height: 110px;
+        display: inline-block;
+        background: #FFFFFF;
+        /*background: linear-gradient(to top, skyblue, azure);*/
+        margin: 10px;
+        padding: 5px;
+        /*border-radius: 4px;*/
+        box-shadow: 0px 0px 5px 2px black;
+        /*cursor: pointer;
+        opacity: 0.9;*/
+    }
+
+    /*.personBlock:hover {
+        opacity: 1;
+    }*/
+
+    .personAvatar {
+        float: left;
+        margin: 5px;
+        margin-right: 11px;
+    }
+
+    .postsButton {
+        background: url(http://onproperty.com.au/wp-content/uploads/2013/12/blog-post-icon.png) no-repeat center center;
+        display: block;
+        width: 20px;
+    }
+
+</style>
+
+
     <h3>Запрос поиска мемберов и их друзей выполнялся: @ViewBag.ExecTime секунд</h3>
-    <div><br/>
+    <div style="margin: 30px auto; width: 800px;">
+    <br/>
 
+        @{
+            int k = 0;
+        }
 
+        @foreach (var user in Model.Values)
+        {
+            k++;
+            <div class="personBlock">
+                <div class="personAvatar"><img src="@user.photo_100" /></div>
 
-        @foreach (var user in Model.Values) {
-            @Html.ActionLink(user.first_name + " " + user.last_name, "GetUserNews", new { userId = user.id })
-            <br/>
+                <div style="margin-top: 7px;"><div style="color: gray; display: inline">#@k</div> <b>@user.first_name @user.last_name</b><br/></div>
+                Друзей: @user.friends.Length<br/>
+                <div style="display: inline-block; margin-top: 10px;">
+                    <a href="@Url.Action("GetUserNews", new {userId = user.id})" alt="Перейти на страницу в вк">
+                        <img src="https://turnkeyit.co.uk/assets/img/Prose-Icon-(Blog).png" width="30"/>
+                    </a>
+                </div>
+                &nbsp;
+                <div style="display: inline-block;">
+                    <a href="https://vk.com/id@(user.id)">
+                        <img src="https://cdn3.iconfinder.com/data/icons/social-media-chat-1/512/VK-128.png" width="30"/>
+                    </a>
+                </div>
+            </div>
         }
 
     </div>

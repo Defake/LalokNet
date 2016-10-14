@@ -5,13 +5,17 @@ using System.Web;
 
 namespace LalokNet.Models {
 
-	public class VKUser
+	public class VkUser
 	{
 
 		public int id;
 		public string first_name;
 		public string last_name;
-		public int[] friends;
+		public string photo_100;
+		public string photo_50;
+		public VkUser[] friends;
+		public string hidden = "";
+		public string deactivated = "";
 
 	}
 }
