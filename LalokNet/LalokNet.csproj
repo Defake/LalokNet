@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="FakeDBInstanse.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -136,7 +137,8 @@
     <Compile Include="Models\VkPost.cs" />
     <Compile Include="Models\VkUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VkDataHolder.cs" />
+    <Compile Include="VkApp.cs" />
+    <Compile Include="DatabaseInteraction.cs" />
     <Compile Include="VkInteraction.cs" />
   </ItemGroup>
   <ItemGroup>

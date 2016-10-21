@@ -16,6 +16,7 @@ namespace LalokNet.Models {
 		public VkUser[] friends;
 		public string hidden = "";
 		public string deactivated = "";
+		public List<VkPost> news;
 
 	}
 }

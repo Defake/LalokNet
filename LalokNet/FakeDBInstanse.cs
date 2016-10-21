@@ -6,15 +6,13 @@ using LalokNet.Models;
 
 namespace LalokNet 
 {
-	public class VkDataHolder
+	public class FakeDBInstanse
 	{
-		public static VkDataHolder instance { get; } = new VkDataHolder();
+		public static FakeDBInstanse instanse { get; } = new FakeDBInstanse();
 
 		public Dictionary<int, VkUser> users;
 
-		public VkDataHolder()
-		{
-			
-		}
+		private FakeDBInstanse() { }
+
 	}
 }
