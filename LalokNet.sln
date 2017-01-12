@@ -1,11 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26014.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LalokNet", "LalokNet\LalokNet.csproj", "{C02A8A55-7CE7-4DBC-89AA-BBFA4FB5F874}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LalokNet.Test", "LalokNet.Test\LalokNet.Test.csproj", "{2ABA14DE-916F-4F9D-945D-5AA2D6D1BF2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VK_API", "VK_API\VK_API.csproj", "{55C718CD-A364-4BD4-958C-33F39EFA57DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseUpdater", "DatabaseUpdater\DatabaseUpdater.csproj", "{4DE541CF-7626-4FD9-8C07-7C399F0A38DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseWorker", "DatabaseWorker\DatabaseWorker.csproj", "{4F27E4A7-DC81-4CB8-9654-181EDC4D22B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbWorker.Test", "DbWorker.Test\DbWorker.Test.csproj", "{4D2FCEE7-9422-44F1-A5A0-F0D3752C47B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +29,22 @@ Global
 		{2ABA14DE-916F-4F9D-945D-5AA2D6D1BF2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ABA14DE-916F-4F9D-945D-5AA2D6D1BF2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2ABA14DE-916F-4F9D-945D-5AA2D6D1BF2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55C718CD-A364-4BD4-958C-33F39EFA57DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55C718CD-A364-4BD4-958C-33F39EFA57DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55C718CD-A364-4BD4-958C-33F39EFA57DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55C718CD-A364-4BD4-958C-33F39EFA57DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DE541CF-7626-4FD9-8C07-7C399F0A38DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DE541CF-7626-4FD9-8C07-7C399F0A38DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DE541CF-7626-4FD9-8C07-7C399F0A38DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DE541CF-7626-4FD9-8C07-7C399F0A38DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F27E4A7-DC81-4CB8-9654-181EDC4D22B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F27E4A7-DC81-4CB8-9654-181EDC4D22B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F27E4A7-DC81-4CB8-9654-181EDC4D22B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F27E4A7-DC81-4CB8-9654-181EDC4D22B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D2FCEE7-9422-44F1-A5A0-F0D3752C47B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D2FCEE7-9422-44F1-A5A0-F0D3752C47B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D2FCEE7-9422-44F1-A5A0-F0D3752C47B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D2FCEE7-9422-44F1-A5A0-F0D3752C47B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

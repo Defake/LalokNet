@@ -1,0 +1,229 @@
+﻿@using System.Web.UI.HtmlControls
+@using LalokNet.Models
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Новости лалки</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+
+<style>
+	.postStyle {
+		/*background: blanchedalmond;*/
+		background: azure;
+		margin: 0 15px 30px 15px;
+		padding: 8px;
+		padding-bottom: 15px;
+		box-shadow: 1px 2px 1px 1px black;
+	}
+
+    .bottomParamBlock {
+        display: inline-block;
+        margin: auto 10px;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+    .bottomParamImage {
+        position:relative;
+        top: 5px;
+    }
+
+	.userFrame {
+		position: fixed;
+		left: 0px;
+		top: 80px;
+		width: 150px;
+		box-shadow: 0px 0px 2px 1px black;
+		background-color: azure;
+	}
+
+	#backButton {
+		position: fixed;
+		left: 0px;
+		top: 0px;
+		margin: 0;
+		padding: 0;
+		cursor: pointer;
+		text-align: center;
+	}
+
+	a, a:visited, a:link {
+		color: gray;
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: gray;
+		text-decoration: underline;
+	}
+
+	.postTop {
+		/*position: absolute;*/
+		margin: 0px 15px;
+		padding: 8px;
+		height: 25px;
+		background: linear-gradient(to top, azure, skyblue);
+		box-shadow: 1px 1px 1px 1px black;
+		border-radius: 10px 10px 0px 0px;
+	}
+
+	.messageBox {
+		width: 650px;
+		margin: 5px auto 20px;
+		padding: 10px;
+		border-width: 1px;
+		border-radius: 10px;
+		text-align: center;
+		font-size: 14pt;
+		cursor: pointer;
+		display: none;
+	}
+
+	.sortTab {
+		/*width: 80px;*/
+		padding: 0 10px 4px;
+		margin: 0px 10px 10px;
+		border-radius: 0px 0px 7px 7px;
+		background-color: #77BBDD;
+		cursor: pointer;
+		float: left;
+	}
+
+	.sortTabChoosed {
+		/*width: 80px;*/
+		margin: 0px 10px 10px;
+		padding: 0 10px 4px;
+		border-radius: 0px 0px 7px 7px;
+		background-color: #77BBDD;
+		cursor: pointer;
+		border-style: inset;
+		border-top-width: 0px;
+		border-width: 2px;
+		border-color: #66AACC;
+		float: left;
+	}
+</style>
+
+<body onload="OnLoadFunc()" style="margin: 0px; padding: 0px;">
+	
+<script type="text/javascript">
+	var i = 0;
+	var sortMethod = 0;
+
+	function AddPostsToContainer() {
+		ChangeMessagesVisibility("loading");
+
+		$.ajax({
+			type: "POST",
+			url: "/Home/AddPosts?data=" + @ViewBag.User.VkId + "," + i + "," + sortMethod,
+			datatype: "html",
+			success: function (res) {
+				$("#postContainer").append(res);
+				ChangeMessagesVisibility("letsLoad");
+				i += 10;
+			},
+			error: function() {
+				ChangeMessagesVisibility("error");
+			}
+		});
+	}
+
+	function ChangeMessagesVisibility(toDisplay) {
+		document.getElementById("letsLoad").style.display = "none";
+		document.getElementById("loading").style.display = "none";
+		document.getElementById("error").style.display = "none";
+
+		document.getElementById(toDisplay).style.display = "block";
+	}
+
+	function ChangeChoosenTab(toDisplay, sortMethodNum) {
+		
+		document.getElementById("sortLikes").className = "sortTab";
+		document.getElementById("sortShares").className = "sortTab";
+		document.getElementById("sortComments").className = "sortTab";
+
+		document.getElementById(toDisplay).className = "sortTabChoosed";
+		sortMethod = sortMethodNum;
+
+		//Reset posts list
+		$("#postContainer").html("");
+		i = 0;
+
+		AddPostsToContainer();
+	}
+
+	function OnLoadFunc() {
+		//ChangeMessagesVisibility("letsLoad");
+		ChangeChoosenTab("sortLikes", 0);
+		//AddPostsToContainer();
+	}
+
+	
+
+</script>
+	
+	
+	@*-------------Fixed left tabs-----------*@
+<div id="backButton" onclick="location.href = 'javascript:history.back()'">
+	<img style="margin: 2px 10px 0px; padding: 0" src="http://s1.iconbird.com/ico/2013/10/464/w128h1281380984457back3.png" width="46" height="40" onmouseover="document.getElementById('backButton').style.backgroundColor = '#EDEDED'" onmouseout="document.getElementById('backButton').style.backgroundColor = 'transparent'"/>
+</div>
+
+<div class="userFrame">
+	<div style="width: 100px; margin: 10px auto 2px"><img src="@ViewBag.User.Avatar100PxLink" style="padding: 0;"/>
+	</div>
+	<div style="padding: 2px 5px 5px 5px; font-size: 12pt; font-family: sans-serif; text-align: center">
+		<div style="display: inline;">
+			<a href="https://vk.com/id@(ViewBag.User.VkId)" alt="Перейти на страницу в вк">
+				<img src="https://cdn3.iconfinder.com/data/icons/social-media-chat-1/512/VK-128.png" width="25"/>
+			</a>
+		</div>
+		<br/>
+		@(ViewBag.User.FirstName) @ViewBag.User.LastName
+
+	</div>
+</div>
+	
+	
+	@*-------------Sort tabs-----------*@
+<div style="margin: 0px auto; width: 350px; height: 40px;">
+	<div id="sortLikes" class="sortTab" onclick="ChangeChoosenTab('sortLikes', 0);">
+		Sort by <img class="bottomParamImage" src="http://www.iconsearch.ru/uploads/icons/medicalvista/128x128/heart_beat.png" width="20" />
+	</div>
+
+	<div id="sortShares" class="sortTab" onclick="ChangeChoosenTab('sortShares', 1);">
+		Sort by <img class="bottomParamImage" src="https://change-wm.com/wp-content/uploads/repost.png" width="20" />
+	</div>
+
+	<div id="sortComments" class="sortTab" onclick="ChangeChoosenTab('sortComments', 2);">
+		Sort by <img class="bottomParamImage" src="http://s1.iconbird.com/ico/2013/8/429/w128h1281377939697185079bubblecommentstreamlinetalk3.png" width="20" />
+	</div>
+</div>
+	
+	@*-------------Posts container---------------*@
+<div id="postContainer" style="margin: 30px auto; width: 650px;">
+	@*<script>
+		AddPostsToContainer();
+	</script>*@
+</div>
+	
+	@*-------------Ajax Messages and buttons-----------*@
+<div class="messageBox" id="letsLoad" style="background-color: #EEEEEE; border-color: #BBBBBB; color: #777777;" onclick="AddPostsToContainer()">
+	Загрузить еще новости
+</div>
+	
+<div class="messageBox" id="loading" style="background-color: #77EE99; border-color: #449956; color: #338844; cursor: default;">
+	Идет загрузка, подождите...
+</div>
+
+<div class="messageBox" id="error" style="background-color: #BB5555; border-color: #552222; color: #703030" onclick="AddPostsToContainer()">
+	Ошибка при загрузке. Попробуйте снова
+</div>
+	
+</body>
+</html>

@@ -4,18 +4,18 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Http;
 
-namespace LalokNet
+namespace DatabaseInteraction
 {
     public class MvcApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
+			GlobalConfiguration.Configure(WebApiConfig.Register);
 
-			// Starts database updater
-			//new VkDatabaseUpdater().Start();
+			AreaRegistration.RegisterAllAreas();
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
     }
 }

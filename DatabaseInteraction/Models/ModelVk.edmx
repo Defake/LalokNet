@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ModelVk.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="ModelVkStoreContainer">
+    <EntitySet Name="UserSet" EntityType="ModelVk.Store.UserSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="PostSet" EntityType="ModelVk.Store.PostSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="PhotoSet" EntityType="ModelVk.Store.PhotoSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="GroupSet" EntityType="ModelVk.Store.GroupSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="GroupUser" EntityType="ModelVk.Store.GroupUser" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="UserUser" EntityType="ModelVk.Store.UserFriend" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="UserPost" Association="ModelVk.Store.UserPost">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="Post" EntitySet="PostSet" />
+    </AssociationSet>
+    <AssociationSet Name="PostPhoto" Association="ModelVk.Store.PostPhoto">
+      <End Role="Post" EntitySet="PostSet" />
+      <End Role="Photo" EntitySet="PhotoSet" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GroupUser_Group" Association="ModelVk.Store.FK_GroupUser_Group">
+      <End Role="Group" EntitySet="GroupSet" />
+      <End Role="GroupUser" EntitySet="GroupUser" />
+    </AssociationSet>
+    <AssociationSet Name="FK_GroupUser_User" Association="ModelVk.Store.FK_GroupUser_User">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="GroupUser" EntitySet="GroupUser" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UserUser_User" Association="ModelVk.Store.FK_UserFriend_User">
+      <End Role="User" EntitySet="UserSet" />
+      <End Role="UserFriend" EntitySet="UserUser" />
+    </AssociationSet>
+    <AssociationSet Name="FK_UserUser_Friend" Association="ModelVk.Store.FK_UserFriend_Friend">
+      <End Role="Friend" EntitySet="UserSet" />
+      <End Role="UserFriend" EntitySet="UserUser" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="UserSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="AvatarLink100" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AvatarLink50" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="IsHidden" Type="bit" Nullable="false" />
+    <Property Name="VkId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PostSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="PostContent" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="PostDate" Type="datetime" Nullable="false" />
+    <Property Name="LikesAmount" Type="int" Nullable="false" />
+    <Property Name="CommentsAmount" Type="int" Nullable="false" />
+    <Property Name="RepostsAmount" Type="int" Nullable="false" />
+    <Property Name="VkId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="User_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PhotoSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ImageLink" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Post_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="GroupSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="VkId" Type="int" Nullable="false" />
+    <Property Name="StringId" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="GroupName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="GroupImageLink" Type="nvarchar(max)" Nullable="true" />
+  </EntityType>
+  <EntityType Name="GroupUser">
+    <Key>
+      <PropertyRef Name="Group_Id" />
+      <PropertyRef Name="User_Id" />
+    </Key>
+    <Property Name="Group_Id" Type="int" Nullable="false" />
+    <Property Name="User_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="UserFriend">
+    <Key>
+      <PropertyRef Name="UserFriend_Friend_Id" />
+      <PropertyRef Name="Friend_Id" />
+    </Key>
+    <Property Name="UserFriend_Friend_Id" Type="int" Nullable="false" />
+    <Property Name="Friend_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="UserPost">
+    <End Role="User" Type="ModelVk.Store.UserSet" Multiplicity="1" />
+    <End Role="Post" Type="ModelVk.Store.PostSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Post">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PostPhoto">
+    <End Role="Post" Type="ModelVk.Store.PostSet" Multiplicity="1" />
+    <End Role="Photo" Type="ModelVk.Store.PhotoSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Post">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Photo">
+        <PropertyRef Name="Post_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GroupUser_Group">
+    <End Role="Group" Type="ModelVk.Store.GroupSet" Multiplicity="1" />
+    <End Role="GroupUser" Type="ModelVk.Store.GroupUser" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="GroupUser">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_GroupUser_User">
+    <End Role="GroupUser" Type="ModelVk.Store.GroupUser" Multiplicity="*" />
+    <End Role="User" Type="ModelVk.Store.UserSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="GroupUser">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UserFriend_User">
+    <End Role="User" Type="ModelVk.Store.UserSet" Multiplicity="1" />
+    <End Role="UserFriend" Type="ModelVk.Store.UserFriend" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="UserFriend">
+        <PropertyRef Name="UserFriend_Friend_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_UserFriend_Friend">
+    <End Role="UserFriend" Type="ModelVk.Store.UserFriend" Multiplicity="*" />
+    <End Role="Friend" Type="ModelVk.Store.UserSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Friend">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="UserFriend">
+        <PropertyRef Name="Friend_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="ModelVk" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="ModelVkContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="UserSet" EntityType="ModelVk.User" />
+          <EntitySet Name="PostSet" EntityType="ModelVk.Post" />
+          <AssociationSet Name="UserPost" Association="ModelVk.UserPost">
+            <End Role="User" EntitySet="UserSet" />
+            <End Role="Post" EntitySet="PostSet" />
+          </AssociationSet>
+          <EntitySet Name="PhotoSet" EntityType="ModelVk.Photo" />
+          <AssociationSet Name="PostPhoto" Association="ModelVk.PostPhoto">
+            <End Role="Post" EntitySet="PostSet" />
+            <End Role="Photo" EntitySet="PhotoSet" />
+          </AssociationSet>
+          <EntitySet Name="GroupSet" EntityType="ModelVk.Group" />
+          <AssociationSet Name="GroupUser" Association="ModelVk.GroupUser">
+            <End Role="Group" EntitySet="GroupSet" />
+            <End Role="User" EntitySet="UserSet" />
+          </AssociationSet>
+          <AssociationSet Name="UserUser" Association="ModelVk.UserFriend">
+            <End Role="User" EntitySet="UserSet" />
+            <End Role="Friend" EntitySet="UserSet" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" />
+          <Property Name="LastName" Type="String" Nullable="false" />
+          <Property Name="AvatarLink100" Type="String" Nullable="true" />
+          <Property Name="AvatarLink50" Type="String" Nullable="true" />
+          <Property Name="IsHidden" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Post" Relationship="ModelVk.UserPost" FromRole="User" ToRole="Post" />
+          <Property Name="VkId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Group" Relationship="ModelVk.GroupUser" FromRole="User" ToRole="Group" />
+          <NavigationProperty Name="Friend" Relationship="ModelVk.UserFriend" FromRole="User" ToRole="Friend" />
+        </EntityType>
+        <EntityType Name="Post">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PostContent" Type="String" Nullable="false" />
+          <Property Name="PostDate" Type="DateTime" Nullable="false" />
+          <Property Name="LikesAmount" Type="Int32" Nullable="false" />
+          <Property Name="CommentsAmount" Type="Int32" Nullable="false" />
+          <Property Name="RepostsAmount" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="ModelVk.UserPost" FromRole="Post" ToRole="User" />
+          <NavigationProperty Name="Photo" Relationship="ModelVk.PostPhoto" FromRole="Post" ToRole="Photo" />
+          <Property Name="VkId" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="UserPost">
+          <End Type="ModelVk.User" Role="User" Multiplicity="1" />
+          <End Type="ModelVk.Post" Role="Post" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Photo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Post" Relationship="ModelVk.PostPhoto" FromRole="Photo" ToRole="Post" />
+          <Property Name="ImageLink" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="PostPhoto">
+          <End Type="ModelVk.Post" Role="Post" Multiplicity="1" />
+          <End Type="ModelVk.Photo" Role="Photo" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Group">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VkId" Type="Int32" Nullable="false" />
+          <Property Name="StringId" Type="String" Nullable="true" />
+          <Property Name="GroupName" Type="String" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="ModelVk.GroupUser" FromRole="Group" ToRole="User" />
+          <Property Name="GroupImageLink" Type="String" Nullable="true" />
+        </EntityType>
+        <Association Name="GroupUser">
+          <End Type="ModelVk.Group" Role="Group" Multiplicity="*" />
+          <End Type="ModelVk.User" Role="User" Multiplicity="*" />
+        </Association>
+        <Association Name="UserFriend">
+          <End Type="ModelVk.User" Role="User" Multiplicity="*" />
+          <End Type="ModelVk.User" Role="Friend" Multiplicity="*" >
+          </End>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="ModelVkStoreContainer" CdmEntityContainer="ModelVkContainer">
+    <EntitySetMapping Name="UserSet">
+      <EntityTypeMapping TypeName="IsTypeOf(ModelVk.User)">
+        <MappingFragment StoreEntitySet="UserSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="AvatarLink100" ColumnName="AvatarLink100" />
+          <ScalarProperty Name="AvatarLink50" ColumnName="AvatarLink50" />
+          <ScalarProperty Name="IsHidden" ColumnName="IsHidden" />
+          <ScalarProperty Name="VkId" ColumnName="VkId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PostSet">
+      <EntityTypeMapping TypeName="IsTypeOf(ModelVk.Post)">
+        <MappingFragment StoreEntitySet="PostSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="PostContent" ColumnName="PostContent" />
+          <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+          <ScalarProperty Name="LikesAmount" ColumnName="LikesAmount" />
+          <ScalarProperty Name="CommentsAmount" ColumnName="CommentsAmount" />
+          <ScalarProperty Name="RepostsAmount" ColumnName="RepostsAmount" />
+          <ScalarProperty Name="VkId" ColumnName="VkId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PhotoSet">
+      <EntityTypeMapping TypeName="IsTypeOf(ModelVk.Photo)">
+        <MappingFragment StoreEntitySet="PhotoSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ImageLink" ColumnName="ImageLink" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GroupSet">
+      <EntityTypeMapping TypeName="IsTypeOf(ModelVk.Group)">
+        <MappingFragment StoreEntitySet="GroupSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="VkId" ColumnName="VkId" />
+          <ScalarProperty Name="StringId" ColumnName="StringId" />
+          <ScalarProperty Name="GroupName" ColumnName="GroupName" />
+          <ScalarProperty Name="GroupImageLink" ColumnName="GroupImageLink" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="UserPost" TypeName="ModelVk.UserPost" StoreEntitySet="PostSet">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="User_Id" />
+      </EndProperty>
+      <EndProperty Name="Post">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="PostPhoto" TypeName="ModelVk.PostPhoto" StoreEntitySet="PhotoSet">
+      <EndProperty Name="Post">
+        <ScalarProperty Name="Id" ColumnName="Post_Id" />
+      </EndProperty>
+      <EndProperty Name="Photo">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="GroupUser" TypeName="ModelVk.GroupUser" StoreEntitySet="GroupUser">
+      <EndProperty Name="Group">
+        <ScalarProperty Name="Id" ColumnName="Group_Id" />
+      </EndProperty>
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="User_Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="UserUser" TypeName="ModelVk.UserFriend" StoreEntitySet="UserUser">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="UserFriend_Friend_Id" />
+      </EndProperty>
+      <EndProperty Name="Friend">
+        <ScalarProperty Name="Id" ColumnName="Friend_Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

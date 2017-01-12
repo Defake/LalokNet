@@ -1,32 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Web;
-using LalokNet.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace LalokNet 
+namespace VK_API 
 {
 	public class JsonToVkConverter
 	{
-
 		public static T Deserialize<T>(string jsonObject, T model, params string[] pathNodes)
 		{
-			//var a = new
-			//{
-			//	error = ""
-			//};
-
-			//var obj = JsonConvert.DeserializeAnonymousType(jsonObject, a);
-			//if (VkInteraction.AnonCast(a, obj).error != null)
-			//{
-			//	var g = 4;
-			//	g++;
-			//}
-			ChangeJsonObject(ref jsonObject, pathNodes);
-			return JsonConvert.DeserializeAnonymousType(jsonObject, model);
+			return 
+				!ChangeJsonDirectory(ref jsonObject, pathNodes) 
+				? default(T) 
+				: JsonConvert.DeserializeAnonymousType(jsonObject, model);
 		}
 
 		/// <summary>
@@ -35,9 +20,9 @@ namespace LalokNet
 		/// <param name="jsonObject">jsonObject - some kind of rootDirectory. Will change after method ends</param>
 		/// <param name="pathNodes">Names of path nodes (or directories) in right order</param>
 		/// <exception cref="ArgumentNullException">Throws exception if meets unexisted object name</exception>
-		private static void ChangeJsonObject(ref string jsonObject, params string[] pathNodes)
+		private static bool ChangeJsonDirectory(ref string jsonObject, params string[] pathNodes)
 		{
-			if (pathNodes == null) return;
+			if (pathNodes == null) return true;
 
 			foreach (string pathNode in pathNodes)
 			{
@@ -46,15 +31,17 @@ namespace LalokNet
 				{
 					nextJsonObject = JObject.Parse(jsonObject).SelectToken(pathNode).ToString();
 				}
-				catch (Exception e)
+				catch (NullReferenceException)
 				{
-					Console.WriteLine("");
+					return false;
 				}
 				if (nextJsonObject != "")
 					jsonObject = nextJsonObject;
 				else
 					throw new ArgumentNullException("There's no object with name " + pathNode);
 			}
+
+			return true;
 		}
 	}
 

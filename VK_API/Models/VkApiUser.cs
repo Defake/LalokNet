@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
-namespace LalokNet.Models {
+namespace VK_API.Models {
 
-	public class VkUser
+	public class VkApiUser
 	{
 
 		public int id;
@@ -13,10 +10,8 @@ namespace LalokNet.Models {
 		public string last_name;
 		public string photo_100;
 		public string photo_50;
-		public VkUser[] friends;
 		public string hidden = "";
 		public string deactivated = "";
-		public List<VkPost> news;
 
 	}
 }

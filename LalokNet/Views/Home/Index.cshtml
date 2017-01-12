@@ -1,5 +1,5 @@
 ﻿@using LalokNet.Models
-@model IEnumerable<KeyValuePair<int, VkUser>>
+@model List<Group>
 
 @{
     Layout = null;
@@ -7,77 +7,49 @@
 
 <!DOCTYPE html>
 
+
+
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Список лалок</title>
+    <meta name="viewport" content="width=device-wUserIdth" />
+    <title>Доступные группы</title>
 </head>
 <body>
-
+	
 <style>
-    .personBlock {
-        width: 360px;
-        height: 110px;
-        display: inline-block;
-        background: #FFFFFF;
-        /*background: linear-gradient(to top, skyblue, azure);*/
-        margin: 10px;
-        padding: 5px;
-        /*border-radius: 4px;*/
-        box-shadow: 0px 0px 5px 2px black;
-        /*cursor: pointer;
-        opacity: 0.9;*/
-    }
+	.groupBlock {
+		margin: 28px;
+		width: 230px;
+		padding: 0;
+		cursor: pointer;
+		display: inline-block;
+		background-color: #F3F3F3;
+		float: left;
+		text-align: center;
+		border-style: ridge;
+		border-width: 2px;
+		border-color: antiquewhite;
+	}
 
-    /*.personBlock:hover {
-        opacity: 1;
-    }*/
-
-    .personAvatar {
-        float: left;
-        margin: 5px;
-        margin-right: 11px;
-    }
-
-    .postsButton {
-        background: url(http://onproperty.com.au/wp-content/uploads/2013/12/blog-post-icon.png) no-repeat center center;
-        display: block;
-        width: 20px;
-    }
-
+	.groupBlock :hover {
+		opacity: 0.8;
+	}
 </style>
 
+<script>
+	
+</script>
 
-    <h3>Запрос поиска мемберов и их друзей выполнялся: @ViewBag.ExecTime секунд</h3>
-    <div style="margin: 30px auto; width: 800px;">
-    <br/>
+<div style="margin: 30px auto; width: 580px;">
+	@foreach (var group in Model)
+	{
+		<div class="groupBlock" onclick="location.href='@Url.Action("GroupPage", new { groupStringId = group.StringId })'">
+			<img src="@(group.Image)" style="padding: 0; margin: 15px 15px 0 15px;"/>
+			<div style="padding: 2px 0px 2px 0px; font-size: 16pt; font-family: sans-serif;">@(@group.Name)</div>
+		</div>	
+	}
 
-        @{
-            int k = 0;
-        }
+</div>
 
-        @foreach (var user in Model)
-        {
-            k++;
-            <div class="personBlock">
-                <div class="personAvatar"><img src="@user.Value.photo_100" /></div>
-
-                <div style="margin-top: 7px;"><div style="color: gray; display: inline">#@k</div> <b>@user.Value.first_name @user.Value.last_name</b><br/></div>
-                Друзей: @user.Value.friends.Length<br/>
-                <div style="display: inline-block; margin-top: 10px;">
-                    <a href="@Url.Action("GetUserNews", new {userId = user.Value.id})" alt="Перейти на страницу в вк">
-                        <img src="https://turnkeyit.co.uk/assets/img/Prose-Icon-(Blog).png" width="30"/>
-                    </a>
-                </div>
-                &nbsp;
-                <div style="display: inline-block;">
-                    <a href="https://vk.com/id@(user.Value.id)">
-                        <img src="https://cdn3.iconfinder.com/data/icons/social-media-chat-1/512/VK-128.png" width="30"/>
-                    </a>
-                </div>
-            </div>
-        }
-
-    </div>
 </body>
 </html>

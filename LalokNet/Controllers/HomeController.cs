@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using DatabaseWorker.Controllers;
+using LalokNet.AppClasses;
 using LalokNet.Models;
 using Newtonsoft.Json;
 
@@ -14,27 +16,60 @@ namespace LalokNet.Controllers
 
 	public class HomeController : Controller
 	{
-
 		// GET: Home
-		public async Task<ActionResult> Index()
-        {
-			var db = new DatabaseInteraction(FakeDBInstanse.instanse);
+		public ActionResult Index()
+		{
+			return View(VkApp.GetIndexPage());
+		}
 
-			var task = VkApp.GetUsersGraph();
+		public ActionResult GroupPage(string groupStringId)
+		{
+			if (groupStringId == "") throw new ArgumentOutOfRangeException(nameof(groupStringId));
 
-			ViewBag.ExecTime = await task;
+			Group group = null;
+			using (var gc = new GroupController())
+			{
+				group = new DbToModelMapper().GroupConvert(gc.GetGroupByStringId(groupStringId));
+			}
 
-			return View(db.GetUsers());
-        }
+			ViewBag.Img = group.Image;
+			ViewBag.Name = group.Name;
 
-		public ActionResult GetUserNews(int userId)
+			return View(VkApp.GetGroupPage(groupStringId));
+		}
+
+		public ActionResult GetUserPage(int userId)
 		{
 			if (userId == 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
-			ViewBag.ExecTime = VkApp.GetNews(userId);
+			User user = null;
+			using (var uc = new UserController())
+				user = new DbToModelMapper().UserConvert(uc.GetEntityById(userId));
 
-			return View(new DatabaseInteraction(FakeDBInstanse.instanse)
-						.GetUsers().ElementAt(userId).Value.news);
+			ViewBag.User = user;
+
+			return View();
+		}
+
+		[HttpPost]
+		public ActionResult AddPosts(string data)
+		{
+			var arr = data.Split(',');
+			var userId = Int32.Parse(arr[0]);
+			var fromId = Int32.Parse(arr[1]);
+			var sortMethod = Int32.Parse(arr[2]);
+
+			var newId = fromId + 10;
+			var posts = VkApp.GetUserPage(userId, sortMethod);
+			var selectedPosts = new List<Post>();
+			for (int i = fromId; i < newId; i++)
+				selectedPosts.Add(posts[i]);
+
+			ViewBag.postId = fromId;
+			ViewBag.newId = newId;
+
+			return PartialView("PostBlocks", selectedPosts);
+
 		}
 
 	}
